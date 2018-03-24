@@ -1,9 +1,13 @@
-version=1.0.0
-prefix=@CMAKE_INSTALL_PREFIX@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+libdir=@libdir@
+includedir=@includedir@
+version=0.1
 
 Name: libirc
 Description: IRC client and server library
-Version: 1.0.0
+Version: 0.1
 Requires:
-Libs: -L@CMAKE_INSTALL_PREFIX@/lib -lirc
-Cflags: -I@CMAKE_INSTALL_PREFIX@/include
+Conflicts:
+Cflags: -I${incluedir}
+Libs: -L${libdir} -lirc
