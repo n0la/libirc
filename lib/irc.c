@@ -298,7 +298,6 @@ irc_error_t irc_queue(irc_t i, irc_message_t m)
 irc_error_t irc_queue_command(irc_t i, char const *command, ...)
 {
     irc_message_t m = NULL;
-    irc_error_t r;
     va_list lst;
 
     return_if_true(i == NULL || command == NULL, irc_error_argument);
