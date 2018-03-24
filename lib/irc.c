@@ -282,6 +282,19 @@ irc_error_t irc_think(irc_t i)
     return r;
 }
 
+irc_error_t irc_queue(irc_t i, irc_message_t m)
+{
+    irc_error_t r;
+
+    return_if_true(i == NULL || m == NULL, irc_error_argument);
+
+    pthread_mutex_lock(&i->sendqmtx);
+    r = irc_queue_push(i->sendq, m);
+    pthread_mutex_unlock(&i->sendqmtx);
+
+    return r;
+}
+
 irc_error_t irc_queue_command(irc_t i, char const *command, ...)
 {
     irc_message_t m = NULL;
@@ -298,11 +311,7 @@ irc_error_t irc_queue_command(irc_t i, char const *command, ...)
         return irc_error_memory;
     }
 
-    pthread_mutex_lock(&i->sendqmtx);
-    r = irc_queue_push(i->sendq, m);
-    pthread_mutex_unlock(&i->sendqmtx);
-
-    return r;
+    return irc_queue(i, m);
 }
 
 irc_error_t irc_handler_add(irc_t i, char const *cmd,

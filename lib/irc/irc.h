@@ -28,12 +28,10 @@ irc_error_t irc_think(irc_t i);
 
 irc_error_t irc_connected(irc_t i);
 
+irc_error_t irc_queue(irc_t i, irc_message_t m);
 irc_error_t irc_queue_command(irc_t i, char const *type, ...);
 
 irc_error_t irc_setopt(irc_t i, ircopt_t o, ...);
-
-irc_error_t irc_realname(irc_t i, char const *name);
-irc_error_t irc_server(irc_t i, char const *server);
 
 irc_error_t irc_handler_add(irc_t i, char const *cmd,
                             irc_command_handler_t handler,
