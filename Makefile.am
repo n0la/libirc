@@ -15,6 +15,7 @@ nobase_include_HEADERS = irc/error.h \
 			 irc/message.h \
 			 irc/queue.h \
 			 irc/strv.h \
+			 irc/strbuf.h \
 			 irc/util.h
 
 AM_CFLAGS =		-I. -Wall -Werror
