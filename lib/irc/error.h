@@ -9,6 +9,7 @@ typedef enum {
     irc_error_protocol,
     irc_error_nodata,
     irc_error_state,
+    irc_error_connection,
 } irc_error_t;
 
 #define IRC_SUCCESS(v) ((v) == irc_error_success)

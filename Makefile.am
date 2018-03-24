@@ -2,6 +2,7 @@ AM_YFLAGS =		-d
 
 lib_LTLIBRARIES =	libirc.la
 libirc_la_SOURCES =	lib/irc.c \
+			lib/client.c \
 			lib/message.c \
 			lib/queue.c \
 			lib/strbuf.c \
@@ -10,6 +11,7 @@ libirc_la_SOURCES =	lib/irc.c \
 
 include_HEADERS =	lib/irc/error.h \
 			lib/irc/irc.h \
+			lib/irc/client.h \
 			lib/irc/message.h \
 			lib/irc/queue.h \
 			lib/irc/strv.h \
