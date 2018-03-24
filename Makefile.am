@@ -9,15 +9,15 @@ libirc_la_SOURCES =	lib/irc.c \
 			lib/strv.c \
 			lib/util.c
 
-include_HEADERS =	lib/irc/error.h \
-			lib/irc/irc.h \
-			lib/irc/client.h \
-			lib/irc/message.h \
-			lib/irc/queue.h \
-			lib/irc/strv.h \
-			lib/irc/util.h
+nobase_include_HEADERS = irc/error.h \
+			 irc/irc.h \
+			 irc/client.h \
+			 irc/message.h \
+			 irc/queue.h \
+			 irc/strv.h \
+			 irc/util.h
 
-AM_CFLAGS =		-Ilib -Wall -Werror
+AM_CFLAGS =		-I. -Wall -Werror
 
 pkgconfig_DATA =	libirc.pc
 
