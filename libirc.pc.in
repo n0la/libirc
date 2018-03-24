@@ -9,5 +9,5 @@ Description: IRC client and server library
 Version: 0.1
 Requires:
 Conflicts:
-Cflags: -I${incluedir}
+Cflags: -I${includedir}
 Libs: -L${libdir} -lirc
