@@ -117,6 +117,11 @@ irc_error_t irc_client_disconnect(irc_client_t c)
     return irc_error_success;
 }
 
+bool irc_client_connected(irc_client_t c)
+{
+    return (c->fd != -1);
+}
+
 irc_error_t irc_client_connect2(irc_client_t c,
                                 char const *host, char const *port,
                                 bool ssl)
