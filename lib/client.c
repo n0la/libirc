@@ -219,6 +219,8 @@ irc_error_t irc_client_connect(irc_client_t c)
 
 int irc_client_read(irc_client_t c, void *buffer, size_t len)
 {
+    int ret = 0;
+
     if (c->fd == -1) {
         return -1;
     }
@@ -228,7 +230,15 @@ int irc_client_read(irc_client_t c, void *buffer, size_t len)
     }
 
     if (c->ssl) {
-        return tls_read(c->tls, buffer, len);
+        do {
+            ret = tls_read(c->tls, buffer, len);
+            if (ret == TLS_WANT_POLLIN || ret == TLS_WANT_POLLOUT) {
+                continue;
+            }
+            if (ret > 0 || ret < 0) {
+                return ret;
+            }
+        } while (1);
     } else {
         return read(c->fd, buffer, len);
     }
@@ -236,6 +246,8 @@ int irc_client_read(irc_client_t c, void *buffer, size_t len)
 
 int irc_client_write(irc_client_t c, void const *buffer, size_t len)
 {
+    int ret = 0;
+
     if (c->fd == -1) {
         return -1;
     }
@@ -245,7 +257,15 @@ int irc_client_write(irc_client_t c, void const *buffer, size_t len)
     }
 
     if (c->ssl) {
-        return tls_write(c->tls, buffer, len);
+        do {
+            ret = tls_write(c->tls, buffer, len);
+            if (ret == TLS_WANT_POLLIN || ret == TLS_WANT_POLLOUT) {
+                continue;
+            }
+            if (ret > 0 || ret < 0) {
+                return ret;
+            }
+        } while (1);
     } else {
         return write(c->fd, buffer, len);
     }
