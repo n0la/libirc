@@ -16,6 +16,8 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
+#include <tls.h>
+
 struct irc_client_
 {
     irc_t irc;
@@ -26,6 +28,9 @@ struct irc_client_
 
     void *addr;
     size_t addrlen;
+
+    struct tls *tls;
+    struct tls_config *tls_config;
 };
 
 irc_client_t irc_client_new(void)
@@ -39,6 +44,12 @@ irc_client_t irc_client_new(void)
 
     c->irc = irc_new();
     if (c->irc == NULL) {
+        free(c);
+        return NULL;
+    }
+
+    c->tls_config = tls_config_new();
+    if (c->tls_config == NULL) {
         free(c);
         return NULL;
     }
@@ -74,6 +85,12 @@ irc_error_t irc_client_disconnect(irc_client_t c)
     free(c->addr);
     c->addr = NULL;
     c->addrlen = 0;
+
+    if (c->tls != NULL) {
+        tls_close(c->tls);
+        tls_free(c->tls);
+        c->tls = NULL;
+    }
 
     return irc_error_success;
 }
@@ -129,6 +146,25 @@ irc_error_t irc_client_connect(irc_client_t c,
 
     /* TODO: SSL with libtls
      */
+    if (ssl) {
+        c->tls = tls_client();
+        if (c->tls == NULL) {
+            irc_client_disconnect(c);
+            return irc_error_tls;
+        }
+
+        /* configure the tls handle
+         */
+        tls_configure(c->tls, c->tls_config);
+
+        /* do a TLS handshake
+         */
+        ret = tls_connect_socket(c->tls, c->fd, host);
+        if (ret < 0) {
+            irc_client_disconnect(c);
+            return irc_error_tls;
+        }
+    }
 
     return irc_error_success;
 }
@@ -139,10 +175,12 @@ int irc_client_read(irc_client_t c, void *buffer, size_t len)
         return -1;
     }
 
-    if (c->ssl) {
-        /* TODO: SSL
-         */
+    if (c->ssl && c->tls == NULL) {
         return -1;
+    }
+
+    if (c->ssl) {
+        return tls_read(c->tls, buffer, len);
     } else {
         return read(c->fd, buffer, len);
     }
@@ -154,10 +192,12 @@ int irc_client_write(irc_client_t c, void const *buffer, size_t len)
         return -1;
     }
 
-    if (c->ssl) {
-        /* TODO: SSL
-         */
+    if (c->ssl && c->tls == NULL) {
         return -1;
+    }
+
+    if (c->ssl) {
+        return tls_write(c->tls, buffer, len);
     } else {
         return write(c->fd, buffer, len);
     }

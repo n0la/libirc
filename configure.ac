@@ -10,6 +10,7 @@ AC_PROG_LEX
 AC_PROG_YACC
 
 PKG_CHECK_MODULES([CMOCKA], [cmocka >= 1.0.1])
+AC_CHECK_LIB([tls], [tls_client])
 
 AC_CHECK_HEADER_STDBOOL()
 AC_CONFIG_FILES([Makefile tests/Makefile])
