@@ -212,6 +212,12 @@ irc_error_t irc_client_connect(irc_client_t c)
             irc_client_disconnect(c);
             return irc_error_tls;
         }
+
+        ret = tls_handshake(c->tls);
+        if (ret < 0) {
+            irc_client_disconnect(c);
+            return irc_error_tls;
+        }
     }
 
     return irc_error_success;
