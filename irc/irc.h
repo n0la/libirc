@@ -9,7 +9,6 @@
 #include <irc/message.h>
 
 struct irc_;
-
 typedef struct irc_ * irc_t;
 
 typedef void (*irc_command_handler_t)(irc_t, irc_message_t m, void *);
@@ -23,6 +22,7 @@ typedef enum {
 irc_t irc_new(void);
 void irc_free(irc_t i);
 
+irc_error_t irc_reset(irc_t i);
 irc_error_t irc_feed(irc_t i, char const *buffer, size_t len);
 irc_error_t irc_think(irc_t i);
 

@@ -131,6 +131,20 @@ void irc_free(irc_t i)
     free(i);
 }
 
+irc_error_t irc_reset(irc_t i)
+{
+    pthread_mutex_lock(&i->sendqmtx);
+    irc_queue_clear(i->sendq, (free_t)irc_message_free);
+    pthread_mutex_unlock(&i->sendqmtx);
+
+    irc_queue_clear(i->channels, (free_t)free);
+    strbuf_reset(i->buf);
+
+    i->state = irc_state_unknown;
+
+    return irc_error_success;
+}
+
 irc_error_t irc_setopt(irc_t i, ircopt_t o, ...)
 {
     va_list lst;

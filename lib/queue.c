@@ -88,3 +88,14 @@ void *irc_queue_pop(irc_queue_t q)
 
     return it->data;
 }
+
+void irc_queue_clear(irc_queue_t q, free_t ff)
+{
+    void *p = NULL;
+
+    while ((p = irc_queue_pop(q)) != NULL) {
+        if (ff != NULL) {
+            ff(p);
+        }
+    }
+}
