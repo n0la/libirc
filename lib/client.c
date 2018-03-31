@@ -117,9 +117,15 @@ irc_error_t irc_client_disconnect(irc_client_t c)
     return irc_error_success;
 }
 
+int irc_client_socket(irc_client_t c)
+{
+    return_if_true(c == NULL, -1);
+    return c->fd;
+}
+
 bool irc_client_connected(irc_client_t c)
 {
-    return (c->fd != -1);
+    return irc_client_socket(c) != -1;
 }
 
 irc_error_t irc_client_connect2(irc_client_t c,

@@ -15,7 +15,9 @@ void irc_client_free(irc_client_t c);
 
 irc_t irc_client_irc(irc_client_t c);
 
+int irc_client_socket(irc_client_t c);
 bool irc_client_connected(irc_client_t c);
+
 irc_error_t irc_client_disconnect(irc_client_t c);
 irc_error_t irc_client_connect(irc_client_t c);
 irc_error_t irc_client_connect2(irc_client_t c,
