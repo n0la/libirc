@@ -62,14 +62,22 @@ irc_client_t irc_client_new(void)
 irc_client_t irc_client_new_config(irc_config_network_t n)
 {
     irc_client_t i = irc_client_new();
+    irc_t irc = NULL;
 
     if (i == NULL) {
         return NULL;
     }
 
+    irc = irc_client_irc(i);
+
     i->host = strdup(irc_config_network_host(n));
     i->port = strdup(irc_config_network_port(n));
     i->ssl = irc_config_network_ssl(n);
+
+    /* set nick and IRC server.
+     */
+    irc_setopt(irc, ircopt_nick, irc_config_network_nick(n));
+    irc_setopt(irc, ircopt_server, i->host);
 
     return i;
 }

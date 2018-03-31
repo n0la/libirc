@@ -21,6 +21,7 @@ struct irc_config_network_
     char *name;
     char *host;
     char *port;
+    char *nick;
     bool ssl;
 };
 
@@ -161,6 +162,12 @@ void irc_config_network_set_port(irc_config_network_t n, char const *p)
     n->port = strdup(p);
 }
 
+void irc_config_network_set_nick(irc_config_network_t n, char const *p)
+{
+    free(n->nick);
+    n->nick = strdup(p);
+}
+
 void irc_config_network_set_ssl(irc_config_network_t n, bool v)
 {
     n->ssl = v;
@@ -178,6 +185,12 @@ char const *irc_config_network_port(irc_config_network_t n)
     return n->port;
 }
 
+char const *irc_config_network_nick(irc_config_network_t n)
+{
+    return_if_true(n == NULL, NULL);
+    return n->nick;
+}
+
 bool irc_config_network_ssl(irc_config_network_t n)
 {
     return_if_true(n == NULL, false);
@@ -193,6 +206,7 @@ void irc_config_network_free(irc_config_network_t n)
     free(n->name);
     free(n->host);
     free(n->port);
+    free(n->nick);
 
     free(n);
 }

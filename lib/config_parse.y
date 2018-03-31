@@ -87,6 +87,11 @@ network_end:    TOK_PAR_CLOSE TOK_SEMI_COLON
                         yyerror(scanner, config, "host and port must be set");
                         YYERROR;
                     }
+
+                    if (irc_config_network_nick(n) == NULL) {
+                        yyerror(scanner, config, "nick is not set");
+                        YYERROR;
+                    }
                 }
                 ;
 
@@ -107,6 +112,8 @@ network_option: TOK_STRING TOK_EQUAL TOK_QUOTED_STRING TOK_SEMI_COLON
                         irc_config_network_set_host(n, value);
                     } else if (strcmp(key, "port") == 0) {
                         irc_config_network_set_port(n, value);
+                    } else if (strcmp(key, "nick") == 0) {
+                        irc_config_network_set_nick(n, value);
                     } else if (strcmp(key, "ssl") == 0 ||
                                strcmp(key, "tls") == 0) {
                         bool val = (strcmp(value, "yes") == 0 ||

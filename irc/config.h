@@ -27,10 +27,12 @@ void irc_config_network_free(irc_config_network_t n);
 
 void irc_config_network_set_host(irc_config_network_t n, char const *h);
 void irc_config_network_set_port(irc_config_network_t n, char const *p);
+void irc_config_network_set_nick(irc_config_network_t n, char const *p);
 void irc_config_network_set_ssl(irc_config_network_t n, bool v);
 
 char const *irc_config_network_host(irc_config_network_t n);
 char const *irc_config_network_port(irc_config_network_t n);
+char const *irc_config_network_nick(irc_config_network_t n);
 bool irc_config_network_ssl(irc_config_network_t n);
 
 #endif
