@@ -25,6 +25,27 @@ int yywrap(void)
 {
     return 1;
 }
+
+char *strip_quote(char *s)
+{
+    size_t len = strlen(s);
+
+    if (len < 1) {
+        return s;
+    }
+
+    if (*s == '"') {
+        memmove(s, s+1, len-1);
+        --len;
+    }
+
+    if (len > 0 && s[len-1] == '"') {
+        s[len-1] = '\0';
+    }
+
+    return s;
+}
+
 %}
 
 %union {
@@ -76,7 +97,7 @@ network_option: TOK_STRING TOK_EQUAL TOK_QUOTED_STRING TOK_SEMI_COLON
                 {
                     irc_config_network_t n = irc_config_last(config);
                     char const *key = $1;
-                    char const *value = $3;
+                    char const *value = strip_quote($3);
 
                     if (n == NULL) {
                         YYERROR;
