@@ -228,6 +228,10 @@ irc_error_t irc_client_connect(irc_client_t c)
         }
     }
 
+    /* tell IRC state that we are connected
+     */
+    irc_connected(c->irc);
+
     return irc_error_success;
 }
 
