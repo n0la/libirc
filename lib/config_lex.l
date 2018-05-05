@@ -30,7 +30,7 @@ network return TOK_NETWORK;
     return TOK_COMMENT;
 }
 
-[a-z]+ {
+[a-z\-\_]+ {
     yylval->string = strdup(yytext);
     return TOK_STRING;
 }

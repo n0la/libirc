@@ -114,6 +114,10 @@ network_option: TOK_STRING TOK_EQUAL TOK_QUOTED_STRING TOK_SEMI_COLON
                         irc_config_network_set_port(n, value);
                     } else if (strcmp(key, "nick") == 0) {
                         irc_config_network_set_nick(n, value);
+                    } else if (strcmp(key, "nickserv") == 0) {
+                        irc_config_network_set_nickserv(n, value);
+                    } else if (strcmp(key, "nickserv_password") == 0) {
+                        irc_config_network_set_nickserv_password(n, value);
                     } else if (strcmp(key, "ssl") == 0 ||
                                strcmp(key, "tls") == 0) {
                         bool val = (strcmp(value, "yes") == 0 ||

@@ -31,6 +31,8 @@ struct irc_client_
 
     struct tls *tls;
     struct tls_config *tls_config;
+
+    irc_config_network_t config;
 };
 
 irc_client_t irc_client_new(void)
@@ -79,6 +81,9 @@ irc_client_t irc_client_new_config(irc_config_network_t n)
     irc_setopt(irc, ircopt_nick, irc_config_network_nick(n));
     irc_setopt(irc, ircopt_server, i->host);
 
+    irc_config_network_ref(n);
+    i->config = n;
+
     return i;
 }
 
@@ -88,8 +93,14 @@ void irc_client_free(irc_client_t c)
 
     irc_free(c->irc);
     c->irc = NULL;
-
+    irc_config_network_unref(c->config);
     free(c);
+}
+
+irc_config_network_t irc_client_config(irc_client_t c)
+{
+    return_if_true(c == NULL, NULL);
+    return c->config;
 }
 
 irc_t irc_client_irc(irc_client_t c)

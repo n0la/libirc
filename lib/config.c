@@ -18,10 +18,13 @@ extern int yyparse(void *scanner, irc_config_t config);
 
 struct irc_config_network_
 {
+    int ref;
     char *name;
     char *host;
     char *port;
     char *nick;
+    char *nickserv;
+    char *nickservpassword;
     bool ssl;
 };
 
@@ -41,7 +44,7 @@ irc_config_t irc_config_new(void)
         return NULL;
     }
 
-    c->networks = pa_new_full((free_t)irc_config_network_free);
+    c->networks = pa_new_full((free_t)irc_config_network_unref);
     if (c->networks == NULL) {
         free(c);
         return NULL;
@@ -146,8 +149,23 @@ irc_config_network_t irc_config_network_new(char const *name)
 
     n->name = strdup(name);
     n->ssl = true;
+    n->nickserv = strdup("nickserv");
+    n->ref = 1;
 
     return n;
+}
+
+void irc_config_network_set_nickserv(irc_config_network_t n, char const *h)
+{
+    free(n->nickserv);
+    n->nickserv = strdup(h);
+}
+
+void irc_config_network_set_nickserv_password(irc_config_network_t n,
+                                              char const *h)
+{
+    free(n->nickservpassword);
+    n->nickservpassword = strdup(h);
 }
 
 void irc_config_network_set_host(irc_config_network_t n, char const *h)
@@ -191,15 +209,42 @@ char const *irc_config_network_nick(irc_config_network_t n)
     return n->nick;
 }
 
+char const *irc_config_network_nickserv(irc_config_network_t n)
+{
+    return_if_true(n == NULL, NULL);
+    return n->nickserv;
+}
+
+char const *irc_config_network_nickserv_password(irc_config_network_t n)
+{
+    return_if_true(n == NULL, NULL);
+    return n->nickservpassword;
+}
+
 bool irc_config_network_ssl(irc_config_network_t n)
 {
     return_if_true(n == NULL, false);
     return n->ssl;
 }
 
-void irc_config_network_free(irc_config_network_t n)
+void irc_config_network_ref(irc_config_network_t n)
 {
     if (n == NULL) {
+        return;
+    }
+
+    ++n->ref;
+}
+
+void irc_config_network_unref(irc_config_network_t n)
+{
+    if (n == NULL) {
+        return;
+    }
+
+    --n->ref;
+
+    if (n->ref > 0) {
         return;
     }
 
@@ -207,6 +252,7 @@ void irc_config_network_free(irc_config_network_t n)
     free(n->host);
     free(n->port);
     free(n->nick);
-
+    free(n->nickserv);
+    free(n->nickservpassword);
     free(n);
 }

@@ -13,6 +13,7 @@ irc_client_t irc_client_new(void);
 irc_client_t irc_client_new_config(irc_config_network_t n);
 void irc_client_free(irc_client_t c);
 
+irc_config_network_t irc_client_config(irc_client_t c);
 irc_t irc_client_irc(irc_client_t c);
 
 int irc_client_socket(irc_client_t c);
