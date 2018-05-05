@@ -6,12 +6,35 @@
 
 irc_message_t irc_message_new(void)
 {
-    return calloc(1, sizeof(struct irc_message_));
+    irc_message_t m = calloc(1, sizeof(struct irc_message_));
+
+    if (m == NULL) {
+        return NULL;
+    }
+
+    m->ref = 1;
+
+    return m;
 }
 
-void irc_message_free(irc_message_t m)
+void irc_message_ref(irc_message_t m)
 {
     if (m == NULL) {
+        return;
+    }
+
+    ++m->ref;
+}
+
+void irc_message_unref(irc_message_t m)
+{
+    if (m == NULL) {
+        return;
+    }
+
+    --m->ref;
+
+    if (m->ref > 0) {
         return;
     }
 
@@ -38,7 +61,7 @@ irc_message_t irc_message_parse2(char const *line, size_t linesize)
 
     e = irc_message_parse(m, line, linesize);
     if (IRC_FAILED(e)) {
-        irc_message_free(m);
+        irc_message_unref(m);
         return NULL;
     }
 

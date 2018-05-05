@@ -134,7 +134,7 @@ void irc_free(irc_t i)
 irc_error_t irc_reset(irc_t i)
 {
     pthread_mutex_lock(&i->sendqmtx);
-    irc_queue_clear(i->sendq, (free_t)irc_message_free);
+    irc_queue_clear(i->sendq, (free_t)irc_message_unref);
     pthread_mutex_unlock(&i->sendqmtx);
 
     irc_queue_clear(i->channels, (free_t)free);
@@ -247,7 +247,7 @@ cleanup:
     free(line);
     line = NULL;
 
-    irc_message_free(m);
+    irc_message_unref(m);
     m = NULL;
 
     return r;
@@ -368,7 +368,7 @@ irc_error_t irc_pop(irc_t i, char **message, size_t *len)
     return_if_true(msg == NULL, irc_error_nodata);
 
     r = irc_message_string(msg, message, len);
-    irc_message_free(msg);
+    irc_message_unref(msg);
 
     return r;
 }
