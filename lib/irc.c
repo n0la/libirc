@@ -145,6 +145,39 @@ irc_error_t irc_reset(irc_t i)
     return irc_error_success;
 }
 
+irc_error_t irc_getopt(irc_t i, ircopt_t o, ...)
+{
+    va_list lst;
+    irc_error_t e = irc_error_success;
+
+    va_start(lst, o);
+    switch (o) {
+    case ircopt_nick:
+    {
+        char **s = va_arg(lst, char**);
+        *s = i->nick;
+    } break;
+
+    case ircopt_server:
+    {
+        char **s = va_arg(lst, char**);
+        *s = i->server;
+    } break;
+
+    case ircopt_realname:
+    {
+        char **s = va_arg(lst, char**);
+        *s = i->realname;
+    } break;
+
+    default: e = irc_error_argument; break;
+
+    }
+    va_end(lst);
+
+    return e;
+}
+
 irc_error_t irc_setopt(irc_t i, ircopt_t o, ...)
 {
     va_list lst;
