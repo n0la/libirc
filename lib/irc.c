@@ -366,9 +366,7 @@ irc_error_t irc_handler_add(irc_t i, char const *cmd,
 {
     irc_handler_t *tmp = NULL;
 
-    tmp = recallocarray(i->handler, i->handlerlen,
-                        i->handlerlen+1, sizeof(irc_handler_t)
-        );
+    tmp = realloc(i->handler, (i->handlerlen+1) * sizeof(irc_handler_t));
     if (!tmp) {
         return irc_error_memory;
     }
