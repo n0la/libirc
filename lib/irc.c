@@ -97,7 +97,7 @@ irc_t irc_new(void)
      */
     r = gethostname(i->hostname, sizeof(i->hostname)-1);
     if (r < 0 || i->hostname[0] == '\0') {
-        strlcpy(i->hostname, "unknown", sizeof(i->hostname));
+        strncpy(i->hostname, "unknown", sizeof(i->hostname)-1);
     }
 
     pthread_mutex_init(&i->buffermtx, NULL);
@@ -379,7 +379,7 @@ irc_error_t irc_handler_add(irc_t i, char const *cmd,
     i->handler[i->handlerlen].handler = handler;
     if (cmd != NULL) {
         strncpy(i->handler[i->handlerlen].cmd, cmd,
-                sizeof(i->handler[i->handlerlen].cmd)
+                sizeof(i->handler[i->handlerlen].cmd) - 1
             );
     }
     ++i->handlerlen;
