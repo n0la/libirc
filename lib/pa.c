@@ -1,5 +1,5 @@
+#include "config.h"
 #include <irc/pa.h>
-
 #include <stdlib.h>
 #include <string.h>
 
@@ -44,11 +44,7 @@ ssize_t pa_add(pa_t v, void *s)
 {
     void **tmp = NULL;
 
-    tmp = recallocarray(v->v,
-                        v->vlen,
-                        v->vlen + 1,
-                        sizeof(void*)
-        );
+    tmp = reallocarray(v->v, v->vlen + 1, sizeof(void*));
     if (tmp == NULL) {
         return -1;
     }

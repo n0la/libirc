@@ -1,5 +1,5 @@
+#include "config.h"
 #include <irc/strbuf.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -58,13 +58,11 @@ ssize_t strbuf_append(strbuf_t b, char const *buffer, ssize_t len)
     if ((len+b->end) > b->bufsize) {
         char *tmp = NULL;
 
-        tmp = recallocarray(b->buf, b->bufsize+1,
-                            b->bufsize+len+1,
-                            sizeof(char)
-            );
+        tmp = reallocarray(b->buf, (b->bufsize+len+1), sizeof(char));
         if (tmp == NULL) {
             return -2;
         }
+        memset(tmp + b->end, 0, len+1);
 
         b->buf = tmp;
         b->bufsize += len;

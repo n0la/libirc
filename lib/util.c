@@ -1,3 +1,4 @@
+#include "config.h"
 #include <irc/util.h>
 
 irc_error_t irc_strv_add(char ***strv, size_t *argslen, char *what)
@@ -9,7 +10,7 @@ irc_error_t irc_strv_add(char ***strv, size_t *argslen, char *what)
         return irc_error_argument;
     }
 
-    tmp = recallocarray(*strv, *argslen, (*argslen)+add, sizeof(char*));
+    tmp = reallocarray(*strv, (*argslen)+add, sizeof(char*));
     if (tmp == NULL) {
         return irc_error_memory;
     }
