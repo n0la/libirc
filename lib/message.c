@@ -1,3 +1,4 @@
+#include "config.h"
 #include <irc/message.h>
 #include <irc/util.h>
 #include <irc/strbuf.h>
