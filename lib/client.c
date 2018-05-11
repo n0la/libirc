@@ -169,7 +169,7 @@ irc_error_t irc_client_connect2(irc_client_t c,
 irc_error_t irc_client_connect(irc_client_t c)
 {
     struct addrinfo *info = NULL, *ai = NULL, hint = {0};
-    int ret = 0, sock = 0;
+    int ret = 0, sock = -1;
 
     if (c->fd != -1) {
         return irc_error_success;
@@ -197,7 +197,8 @@ irc_error_t irc_client_connect(irc_client_t c)
         sock = -1;
     }
 
-    if (sock < 0) {
+    if (sock < 0 || ai == NULL) {
+        freeaddrinfo(info);
         return irc_error_connection;
     }
 
@@ -206,12 +207,15 @@ irc_error_t irc_client_connect(irc_client_t c)
     free(c->addr);
     c->addr = calloc(1, ai->ai_addrlen);
     if (c->addr == NULL) {
+        freeaddrinfo(info);
         return irc_error_memory;
     }
     memcpy(c->addr, ai->ai_addr, ai->ai_addrlen);
     c->addrlen = ai->ai_addrlen;
 
     c->fd = sock;
+    freeaddrinfo(info);
+    info = NULL;
 
     if (c->ssl) {
         c->tls = tls_client();
