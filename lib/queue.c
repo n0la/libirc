@@ -71,6 +71,7 @@ irc_error_t irc_queue_push(irc_queue_t q, void *what)
 void *irc_queue_pop(irc_queue_t q)
 {
     irc_queue_item_t it = NULL, prev = NULL;
+    void *data = NULL;
 
     return_if_true(q == NULL, NULL);
     return_if_true(q->head == NULL, NULL);
@@ -86,7 +87,10 @@ void *irc_queue_pop(irc_queue_t q)
         q->head = q->tail = NULL;
     }
 
-    return it->data;
+    data = it->data;
+    free(it);
+
+    return data;
 }
 
 void irc_queue_clear(irc_queue_t q, free_t ff)
