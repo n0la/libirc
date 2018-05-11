@@ -30,6 +30,9 @@ void strbuf_free(strbuf_t b)
         return;
     }
 
+    free(b->buf);
+    b->bufsize = b->end = 0;
+
     free(b);
 }
 
