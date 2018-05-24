@@ -1,4 +1,4 @@
-#include "config.h"
+#define _GNU_SOURCE
 #include <irc/strbuf.h>
 #include <stdio.h>
 #include <stdlib.h>

@@ -1,4 +1,4 @@
-#include "config.h"
+#define _GNU_SOURCE
 #include <irc/pa.h>
 #include <stdlib.h>
 #include <string.h>

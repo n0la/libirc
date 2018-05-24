@@ -1,4 +1,4 @@
-#include "config.h"
+#define _GNU_SOURCE
 #include <irc/util.h>
 
 irc_error_t irc_strv_add(char ***strv, size_t *argslen, char *what)
