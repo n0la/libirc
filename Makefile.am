@@ -11,7 +11,16 @@ libirc_la_SOURCES =	lib/irc.c \
 			lib/util.c \
 			lib/config.c \
 			lib/config_parse.y \
-			lib/config_lex.l
+			lib/config_lex.l \
+			lib/ssl.h
+
+EXTRA_libirc_la_SOURCES =	lib/libtls.c
+
+if USE_LIBTLS
+SSL_IMPLEMENTATION =	lib/libtls.c
+endif
+
+libirc_la_LIBADD =		$(SSL_IMPLEMENTATION)
 
 nobase_include_HEADERS = irc/error.h \
 			 irc/irc.h \

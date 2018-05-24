@@ -1,0 +1,86 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.2)
+
+ENABLE_TESTING()
+
+FIND_PACKAGE(BISON REQUIRED)
+FIND_PACKAGE(FLEX REQUIRED)
+FIND_PACKAGE(PkgConfig REQUIRED)
+
+PKG_CHECK_MODULES(CMOCKA cmocka REQUIRED)
+PKG_CHECK_MODULES(LIBTLS libtls)
+PKG_CHECK_MODULES(GNUTLS gnutls)
+
+SET(DEST_DIR "${CMAKE_INSTALL_PREFIX}")
+SET(IRC_VERSION "0.1")
+
+CONFIGURE_FILE(
+  "${CMAKE_CURRENT_SOURCE_DIR}/libirc.pc.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/libirc.pc"
+  @ONLY
+  )
+INSTALL(FILES "${CMAKE_CURRENT_BINARY_DIR}/libirc.pc"
+  DESTINATION share/pkgconfig)
+
+BISON_TARGET("config_parse"
+  "${CMAKE_CURRENT_SOURCE_DIR}/lib/config_parse.y"
+  "${CMAKE_CURRENT_BINARY_DIR}/config_parse.c"
+  )
+
+FLEX_TARGET("config_lex"
+  "${CMAKE_CURRENT_SOURCE_DIR}/lib/config_lex.l"
+  "${CMAKE_CURRENT_BINARY_DIR}/config_lex.c"
+  )
+
+SET(TARGET "irc")
+SET(SOURCES
+  "lib/irc.c"
+  "lib/client.c"
+  "lib/message.c"
+  "lib/queue.c"
+  "lib/strbuf.c"
+  "lib/pa.c"
+  "lib/util.c"
+  "lib/config.c"
+  "lib/ssl.h"
+  "${CMAKE_CURRENT_BINARY_DIR}/config_parse.c"
+  "${CMAKE_CURRENT_BINARY_DIR}/config_lex.c"
+  )
+
+SET(HEADERS
+  "irc/error.h"
+  "irc/irc.h"
+  "irc/client.h"
+  "irc/queue.h"
+  "irc/pa.h"
+  "irc/strbuf.h"
+  "irc/util.h"
+  "irc/config.h"
+  "irc/message.h"
+  )
+
+IF (NOT LIBTLS_FOUND AND NOT GNUTLS_FOUND)
+  MESSAGE(ERROR "No suitable TLS implementation found")
+ENDIF()
+
+IF (LIBTLS_FOUND)
+  LIST(APPEND SOURCES "lib/libtls.c")
+  INCLUDE_DIRECTORIES(${LIBTLS_INCLUDE_DIR})
+ENDIF()
+
+IF (GNUTLS_FOUND)
+  LIST(APPEND SOURCES "lib/gnutls.c")
+  INCLUDE_DIRECTORIES(${GNUTLS_INCLUDE_DIR})
+ENDIF()
+
+INCLUDE_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}")
+ADD_LIBRARY(${TARGET} SHARED ${SOURCES} ${HEADERS})
+INSTALL(TARGETS ${TARGET} DESTINATION lib)
+INSTALL(FILES ${HEADERS} DESTINATION include/irc)
+
+IF (LIBTLS_FOUND)
+  TARGET_LINK_LIBRARIES(${TARGET} ${LIBTLS_LIBRARIES})
+ELSEIF (GNUTLS_FOUND)
+  TARGET_LINK_LIBRARIES(${TARGET} ${GNUTLS_LIBRARIES})
+ENDIF()
+
+ADD_SUBDIRECTORY(tests)

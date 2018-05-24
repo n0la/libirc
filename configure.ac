@@ -11,7 +11,9 @@ AC_PROG_LEX
 AC_PROG_YACC
 
 PKG_CHECK_MODULES([CMOCKA], [cmocka >= 1.0.1])
+
 AC_CHECK_LIB([tls], [tls_client])
+AM_CONDITIONAL([USE_LIBTLS], [test HAVE_LIBTLS = 1])
 
 AC_CHECK_FUNCS([asprintf vasprintf])
 

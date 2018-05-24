@@ -16,7 +16,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 
-#include <tls.h>
+#include "ssl.h"
 
 struct irc_client_
 {
@@ -29,8 +29,7 @@ struct irc_client_
     void *addr;
     size_t addrlen;
 
-    struct tls *tls;
-    struct tls_config *tls_config;
+    void *tls;
 
     irc_config_network_t config;
 };
@@ -50,8 +49,9 @@ irc_client_t irc_client_new(void)
         return NULL;
     }
 
-    c->tls_config = tls_config_new();
-    if (c->tls_config == NULL) {
+    c->tls = irc_ssl_client_new();
+    if (c->tls == NULL) {
+        irc_free(c->irc);
         free(c);
         return NULL;
     }
@@ -94,6 +94,12 @@ void irc_client_free(irc_client_t c)
     irc_free(c->irc);
     c->irc = NULL;
     irc_config_network_unref(c->config);
+
+    if (c->tls != NULL) {
+        irc_ssl_client_free(c->tls);
+        c->tls = NULL;
+    }
+
     free(c);
 }
 
@@ -113,6 +119,7 @@ irc_error_t irc_client_disconnect(irc_client_t c)
 {
     return_if_true(c->fd == -1, irc_error_success);
 
+    irc_ssl_client_disconnect(c->tls);
     irc_reset(c->irc);
 
     close(c->fd);
@@ -121,12 +128,6 @@ irc_error_t irc_client_disconnect(irc_client_t c)
     free(c->addr);
     c->addr = NULL;
     c->addrlen = 0;
-
-    if (c->tls != NULL) {
-        tls_close(c->tls);
-        tls_free(c->tls);
-        c->tls = NULL;
-    }
 
     free(c->host);
     free(c->port);
@@ -218,27 +219,8 @@ irc_error_t irc_client_connect(irc_client_t c)
     info = NULL;
 
     if (c->ssl) {
-        c->tls = tls_client();
-        if (c->tls == NULL) {
-            irc_client_disconnect(c);
-            return irc_error_tls;
-        }
-
-        /* configure the tls handle
-         */
-        tls_configure(c->tls, c->tls_config);
-
-        /* do a TLS handshake
-         */
-        ret = tls_connect_socket(c->tls, c->fd, c->host);
-        if (ret < 0) {
-            irc_client_disconnect(c);
-            return irc_error_tls;
-        }
-
-        ret = tls_handshake(c->tls);
-        if (ret < 0) {
-            irc_client_disconnect(c);
+        ret = irc_ssl_client_connect(c->tls, c->fd, c->host);
+        if (ret != irc_error_success) {
             return irc_error_tls;
         }
     }
@@ -252,8 +234,6 @@ irc_error_t irc_client_connect(irc_client_t c)
 
 int irc_client_read(irc_client_t c, void *buffer, size_t len)
 {
-    int ret = 0;
-
     if (c->fd == -1) {
         return -1;
     }
@@ -263,15 +243,7 @@ int irc_client_read(irc_client_t c, void *buffer, size_t len)
     }
 
     if (c->ssl) {
-        do {
-            ret = tls_read(c->tls, buffer, len);
-            if (ret == TLS_WANT_POLLIN || ret == TLS_WANT_POLLOUT) {
-                continue;
-            }
-            if (ret > 0 || ret < 0) {
-                return ret;
-            }
-        } while (1);
+        return irc_ssl_client_read(c->tls, buffer, len);
     } else {
         return read(c->fd, buffer, len);
     }
@@ -279,8 +251,6 @@ int irc_client_read(irc_client_t c, void *buffer, size_t len)
 
 int irc_client_write(irc_client_t c, void const *buffer, size_t len)
 {
-    int ret = 0;
-
     if (c->fd == -1) {
         return -1;
     }
@@ -290,15 +260,7 @@ int irc_client_write(irc_client_t c, void const *buffer, size_t len)
     }
 
     if (c->ssl) {
-        do {
-            ret = tls_write(c->tls, buffer, len);
-            if (ret == TLS_WANT_POLLIN || ret == TLS_WANT_POLLOUT) {
-                continue;
-            }
-            if (ret > 0 || ret < 0) {
-                return ret;
-            }
-        } while (1);
+        return irc_ssl_client_write(c->tls, buffer, len);
     } else {
         return write(c->fd, buffer, len);
     }
