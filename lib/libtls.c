@@ -1,6 +1,7 @@
 #include "ssl.h"
 
 #include <tls.h>
+#include <stdlib.h>
 
 typedef struct {
     struct tls *tls;
@@ -12,7 +13,7 @@ void *irc_ssl_client_new(void)
     libtls_t *p = calloc(1, sizeof(libtls_t));
 
     p->tls_config = tls_config_new();
-    if (c->tls_config == NULL) {
+    if (p->tls_config == NULL) {
         irc_ssl_client_free(p);
         return NULL;
     }
@@ -32,15 +33,15 @@ void irc_ssl_client_free(void *arg)
 {
     libtls_t *p = (libtls_t*)arg;
 
-    if (c->tls != NULL) {
+    if (p->tls != NULL) {
         tls_close(p->tls);
         tls_free(p->tls);
-        c->tls = NULL;
+        p->tls = NULL;
     }
 
-    if (c->tls_config != NULL) {
+    if (p->tls_config != NULL) {
         tls_config_free(p->tls_config);
-        c->tls_config = NULL;
+        p->tls_config = NULL;
     }
 
     free(p);
@@ -48,15 +49,15 @@ void irc_ssl_client_free(void *arg)
 
 irc_error_t irc_ssl_client_disconnect(void *arg)
 {
-    libtls_t *c = (libtls_t*)arg;
+    libtls_t *p = (libtls_t*)arg;
 
-    if (c->tls == NULL) {
+    if (p->tls == NULL) {
         return irc_error_success;
     }
 
     tls_close(p->tls);
     tls_free(p->tls);
-    c->tls = NULL;
+    p->tls = NULL;
 
     return irc_error_success;
 }
