@@ -1,11 +1,11 @@
 prefix=@DEST_DIR@
 libdir=@DEST_DIR@/lib
 includedir=@DEST_DIR@/include
-version=@IRC_VERSION@
+version=@PROJECT_VERSION@
 
 Name: libirc
 Description: IRC client library
-Version: @IRC_VERSION@
+Version: @PROJECT_VERSION@
 Requires:
 Conflicts:
 Cflags: -I${includedir}
