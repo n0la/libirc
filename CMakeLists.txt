@@ -59,7 +59,7 @@ SET(HEADERS
   )
 
 IF (NOT LIBTLS_FOUND AND NOT GNUTLS_FOUND)
-  MESSAGE(ERROR "No suitable TLS implementation found")
+  MESSAGE(FATAL_ERROR "No suitable TLS implementation found")
 ENDIF()
 
 IF (LIBTLS_FOUND)
