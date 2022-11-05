@@ -2,6 +2,7 @@
 #define LIBIRC_MESSAGE_H
 
 #include <irc/error.h>
+#include <irc/tag.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -23,6 +24,8 @@ struct irc_message_
     char *command;
     char **args;
     size_t argslen;
+    irc_tag_t *tags;
+    size_t tagslen;
 };
 
 typedef struct irc_message_ *irc_message_t;

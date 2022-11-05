@@ -48,6 +48,12 @@ void irc_message_unref(irc_message_t m)
     irc_strv_free(m->args);
     m->args = NULL;
 
+    for (size_t i = 0; i < m->tagslen; ++i) {
+        irc_tag_free(m->tags[i]);
+    }
+    free(m->tags);
+    m->tags = NULL;
+
     free(m);
 }
 
@@ -96,12 +102,14 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
     char *prefix = NULL, *command = NULL;
     char **args = NULL;
     size_t argslen = 0;
+    irc_tag_t *tags = NULL;
+    size_t tagslen = 0;
 
     char *line = strdup(l);
     char *ptr = line;
     char *part = NULL;
     irc_error_t r = irc_error_memory;
-    int i = 0;
+    size_t i = 0;
 
     while ((part = strsep(&line, " ")) != NULL) {
         if (*part == '\0') {
@@ -113,12 +121,33 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
         {
         case 0:
         {
-            /* check if we actually have a prefix. They start with ':'
-             * and if we don't have one, we assume the first part is
-             * the command and move past the command thing.
+            /* check if we actually have tags or a prefix. Tags start with '@'
+             * and prefix start with ':' and if we don't have one, we assume
+             * the first part is the command and move past the command thing.
              */
-            if (*part == ':') {
-                prefix = strdup(part+1);
+            if (*part == '@') {
+                char *tmp = strdup(part + 1);
+                char *tag = NULL;
+
+                while ((tag = strsep(&tmp, ";")) != NULL) {
+                    irc_tag_t t = irc_tag_new();
+                    if (t == NULL) {
+                        goto cleanup;
+                    }
+
+                    r = irc_tag_parse(t, tag);
+                    if (IRC_FAILED(r)) {
+                        irc_tag_free(t);
+                        goto cleanup;
+                    }
+
+                    tags = realloc(tags, sizeof(irc_message_t) * (tagslen + 1));
+                    tags[tagslen++] = t;
+                }
+                continue;
+            }
+            else if (*part == ':') {
+                prefix = strdup(part + 1);
             } else {
                 command = strdup(part);
                 ++i;
@@ -166,6 +195,8 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
     c->command = command;
     c->args = args;
     c->argslen = argslen;
+    c->tags = tags;
+    c->tagslen = tagslen;
 
     r = irc_error_success;
 
@@ -179,6 +210,11 @@ cleanup:
         free(command);
         irc_strv_free(args);
         args = NULL;
+        for (size_t i = 0; i < tagslen; ++i) {
+            irc_tag_free(tags[i]);
+        }
+        free(tags);
+        tags = NULL;
     }
 
     free(ptr);
