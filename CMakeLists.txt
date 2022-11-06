@@ -42,6 +42,7 @@ SET(SOURCES
   "lib/util.c"
   "lib/config.c"
   "lib/ssl.h"
+  "lib/tag.c"
   "${CMAKE_CURRENT_BINARY_DIR}/config_parse.c"
   "${CMAKE_CURRENT_BINARY_DIR}/config_lex.c"
   )
@@ -56,6 +57,7 @@ SET(HEADERS
   "irc/util.h"
   "irc/config.h"
   "irc/message.h"
+  "irc/tag.h"
   )
 
 IF (NOT LIBTLS_FOUND AND NOT GNUTLS_FOUND)
