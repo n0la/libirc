@@ -55,7 +55,7 @@ irc_message_t irc_message_makev(char const *prefix,
 irc_error_t irc_message_string(irc_message_t m, char **s, size_t *slen);
 
 bool irc_message_is(irc_message_t m, char const *cmd);
-bool irc_message_arg_is(irc_message_t m, int idx, char const *what);
+bool irc_message_arg_is(irc_message_t m, size_t idx, char const *what);
 bool irc_message_prefix_nick(irc_message_t m, char const *nick);
 
 #endif

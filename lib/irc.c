@@ -235,7 +235,6 @@ static irc_error_t irc_think_data(irc_t i)
     size_t linesize = 0;
     irc_error_t r = irc_error_internal;
     irc_message_t m = NULL;
-    int idx = 0;
 
     pthread_mutex_lock(&i->buffermtx);
     s = strbuf_getstr(i->buf, &line, &linesize, "\r\n");
@@ -264,7 +263,7 @@ static irc_error_t irc_think_data(irc_t i)
         goto cleanup;
     }
 
-    for (idx = 0; idx < i->handlerlen; idx++) {
+    for (size_t idx = 0; idx < i->handlerlen; idx++) {
         irc_handler_t *h = i->handler + idx;
 
         if (strlen(h->cmd) == 0 ||

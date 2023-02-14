@@ -184,7 +184,7 @@ int strbuf_getc(strbuf_t b)
     return *b->buf;
 }
 
-int strbuf_delete(strbuf_t b, int how)
+int strbuf_delete(strbuf_t b, size_t how)
 {
     if (b == NULL || how > b->end) {
         return -1;

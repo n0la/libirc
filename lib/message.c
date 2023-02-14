@@ -340,10 +340,10 @@ bool irc_message_is(irc_message_t m, char const *cmd)
     return (strcmp(m->command, cmd) == 0);
 }
 
-bool irc_message_arg_is(irc_message_t m, int idx, char const *what)
+bool irc_message_arg_is(irc_message_t m, size_t idx, char const *what)
 {
     return_if_true(m == NULL, false);
-    return_if_true(idx >= m->argslen || idx < 0, false);
+    return_if_true(idx >= m->argslen, false);
     return (strcmp(m->args[idx], what) == 0);
 }
 
