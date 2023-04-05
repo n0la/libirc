@@ -36,7 +36,6 @@ irc_error_t irc_tag_parse(irc_tag_t t, const char *str)
 {
     char *tmp = NULL;
     char *key = NULL;
-    char *value = NULL;
 
     if (t == NULL || str == NULL) {
         return irc_error_argument;

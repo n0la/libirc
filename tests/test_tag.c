@@ -60,7 +60,6 @@ static void test_tag_parse_single(void **data)
 
 static void test_tag_unescape(void **data)
 {
-    irc_tag_t t = *data;
     char *unscaped = NULL;
 
     ASSERT_TAG_UNSESCAPED ("\\:", ";");
