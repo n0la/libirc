@@ -143,7 +143,7 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
                         goto cleanup;
                     }
 
-                    tags = realloc(tags, sizeof(irc_message_t) * (tagslen + 1));
+                    tags = realloc(tags, sizeof(irc_tag_t) * (tagslen + 1));
                     tags[tagslen++] = t;
                 }
                 free(tmp_ptr);
