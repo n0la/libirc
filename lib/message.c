@@ -127,6 +127,7 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
              */
             if (*part == '@') {
                 char *tmp = strdup(part + 1);
+                char *tmp_ptr = tmp;
                 char *tag = NULL;
 
                 while ((tag = strsep(&tmp, ";")) != NULL) {
@@ -138,12 +139,14 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
                     r = irc_tag_parse(t, tag);
                     if (IRC_FAILED(r)) {
                         irc_tag_free(t);
+                        free(tmp_ptr);
                         goto cleanup;
                     }
 
-                    tags = realloc(tags, sizeof(irc_message_t) * (tagslen + 1));
+                    tags = realloc(tags, sizeof(irc_tag_t) * (tagslen + 1));
                     tags[tagslen++] = t;
                 }
+                free(tmp_ptr);
                 continue;
             }
             else if (*part == ':') {
