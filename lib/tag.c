@@ -65,10 +65,10 @@ char *irc_tag_unescape(char const *value)
     unescaped = strbuf_new();
 
     while (value && value[0]) {
-        switch(value[0]) {
+        switch (value[0]) {
         case '\\':
             value++;
-            switch(value[0]) {
+            switch (value[0]) {
             case ':':
                 strbuf_append(unescaped, ";", 1);
                 value++;
@@ -108,6 +108,43 @@ char *irc_tag_unescape(char const *value)
         ret = strbuf_strdup(unescaped);
     }
     strbuf_free(unescaped);
+
+    return ret;
+}
+
+char *irc_tag_escape(char const *value)
+{
+    char *ret = NULL;
+    strbuf_t escaped = NULL;
+
+    escaped = strbuf_new();
+
+    while (value && value[0]) {
+        switch (value[0]) {
+        case ';':
+            strbuf_append(escaped, "\\:", 2);
+            break;
+        case ' ':
+            strbuf_append(escaped, "\\s", 2);
+            break;
+        case '\\':
+            strbuf_append(escaped, "\\\\", 2);
+            break;
+        case '\r':
+            strbuf_append(escaped, "\\r", 2);
+            break;
+        case '\n':
+            strbuf_append(escaped, "\\n", 2);
+            break;
+        default:
+            strbuf_append(escaped, value, 1);
+            break;
+        }
+        value++;
+    }
+
+    ret = strbuf_strdup(escaped);
+    strbuf_free(escaped);
 
     return ret;
 }
