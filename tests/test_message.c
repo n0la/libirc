@@ -66,12 +66,37 @@ static void test_message_parse_with_multiple_tag(void **data)
     irc_message_unref(m);
 }
 
+static void test_message_string(void **data)
+{
+    irc_message_t m = irc_message_new();
+    const char *expected = "@key1=value1;key2=value2 :prefix COMMAND Arg\r\n";
+    char *str = NULL;
+    irc_error_t error = irc_error_internal;
+    char *actual = NULL;
+    size_t len = 0;
+
+    // Allocate string for parsing without the "\r\n"
+    str = calloc(sizeof(char), strlen(expected) - 1);
+    memcpy(str, expected, strlen(expected) - 2);
+    error = irc_message_parse(m, str, strlen(str));
+    assert_return_code(error, irc_error_success);
+
+    error = irc_message_string(m, &actual, &len);
+    assert_return_code(error, irc_error_success);
+    assert_string_equal(actual, expected);
+
+    free(str);
+    free(actual);
+    irc_message_unref(m);
+}
+
 int main(int ac, char **av)
 {
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_message_parse_without_tag),
         cmocka_unit_test(test_message_parse_with_single_tag),
         cmocka_unit_test(test_message_parse_with_multiple_tag),
+        cmocka_unit_test(test_message_string),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

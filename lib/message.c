@@ -117,8 +117,7 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
             continue;
         }
 
-        switch (i)
-        {
+        switch (i) {
         case 0:
         {
             /* check if we actually have tags or a prefix. Tags start with '@'
@@ -299,6 +298,29 @@ irc_error_t irc_message_string(irc_message_t m, char **s, size_t *slen)
     buf = strbuf_new();
     if (buf == NULL) {
         return irc_error_memory;
+    }
+
+    if (m->tagslen > 0) {
+        strbuf_append(buf, "@", 1);
+        for (size_t i = 0; i < m->tagslen; i++) {
+            irc_error_t error = irc_error_internal;
+            char *str = NULL;
+            size_t len = 0;
+
+            error = irc_tag_string(m->tags[i], &str, &len);
+            if (IRC_FAILED(error)) {
+                strbuf_free(buf);
+                free(str);
+                return error;
+            } else {
+                strbuf_append(buf, str, len);
+            }
+            free(str);
+
+            if (i + 1 < m->tagslen)
+                strbuf_append(buf, ";", 1);
+        }
+        strbuf_append(buf, " ", 1);
     }
 
     if (m->prefix) {
