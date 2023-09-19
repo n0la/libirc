@@ -57,6 +57,33 @@ irc_error_t irc_tag_parse(irc_tag_t t, char const *str)
     return irc_error_success;
 }
 
+irc_error_t irc_tag_string(irc_tag_t t, char **s, size_t *slen)
+{
+    strbuf_t buf = NULL;
+
+    if (t == NULL || t->key == NULL || s == NULL) {
+        return irc_error_argument;
+    }
+
+    buf = strbuf_new();
+    strbuf_append(buf, t->key, strlen(t->key));
+    if (t->value != NULL) {
+        char *value = irc_tag_escape(t->value);
+
+        strbuf_append(buf, "=", 1);
+        strbuf_append(buf, value, strlen(value));
+        free(value);
+    }
+
+    *s = strbuf_strdup (buf);
+    if (slen != NULL) {
+        *slen = strbuf_len(buf);
+    }
+    strbuf_free(buf);
+
+    return irc_error_success;
+}
+
 char *irc_tag_unescape(char const *value)
 {
     char *ret = NULL;
