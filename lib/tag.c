@@ -34,20 +34,25 @@ void irc_tag_free(irc_tag_t t)
 
 irc_error_t irc_tag_parse(irc_tag_t t, const char *str)
 {
-    char *tmp = NULL;
+    char *ptr = NULL;
+    char *value = NULL;
     char *key = NULL;
 
     if (t == NULL || str == NULL) {
         return irc_error_argument;
     }
 
-    tmp = strdup(str);
-    key = strsep(&tmp, "=");
-    if (key == NULL) {
-        return irc_error_parse;
+    value = strdup(str);
+    if (value == NULL) {
+        return irc_error_memory;
     }
+    ptr = value;
+
+    key = strsep(&value, "=");
     t->key = strdup(key);
-    t->value = irc_tag_unescape(tmp);
+    t->value = irc_tag_unescape(value);
+
+    free(ptr);
 
     return irc_error_success;
 }
