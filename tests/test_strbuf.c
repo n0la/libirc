@@ -14,6 +14,8 @@ static void test_strbuf_new(void **data)
 
     assert_true(strbuf_len(b) == 0);
     assert_true(strbuf_strdup(b) == NULL);
+
+    strbuf_free(b);
 }
 
 static void test_strbuf_append(void **data)
@@ -45,6 +47,9 @@ static void test_strbuf_getline(void **data)
     assert_true(strbuf_getline(b, &line, &linelen) == 0);
     assert_true(strcmp(line, "test\n") == 0);
     assert_true(strbuf_len(b) == (strlen("foo\n") + strlen("bar\n")));
+
+    free(line);
+    strbuf_free(b);
 }
 
 static void test_strbuf_getline_empty(void **data)
@@ -77,6 +82,7 @@ static void test_strbuf_getline_empty(void **data)
 
     free(line);
     linelen = 0;
+    strbuf_free(b);
 }
 
 static void test_strbuf_getstr(void **data)
@@ -92,6 +98,9 @@ static void test_strbuf_getstr(void **data)
     assert_true(strbuf_getstr(b, &line, &linelen, "\r\n") == 0);
     assert_true(strcmp(line, "test\r\n") == 0);
     assert_true(strbuf_len(b) == (strlen("foo\r\n") + strlen("bar\r\n")));
+
+    free(line);
+    strbuf_free(b);
 }
 
 static void test_strbuf_getline_depleted(void **data)
@@ -117,6 +126,8 @@ static void test_strbuf_getline_depleted(void **data)
     /* no more data available
      */
     assert_true(strbuf_getline(b, &line, &linelen) < 0);
+
+    strbuf_free(b);
 }
 
 static void test_strbuf_getstr_empty(void **data)
@@ -149,6 +160,7 @@ static void test_strbuf_getstr_empty(void **data)
 
     free(line);
     linelen = 0;
+    strbuf_free(b);
 }
 
 static void test_strbuf_getstr_depleted(void **data)
@@ -174,6 +186,8 @@ static void test_strbuf_getstr_depleted(void **data)
     /* no more data available
      */
     assert_true(strbuf_getstr(b, &line, &linelen, "\r\n") < 0);
+
+    strbuf_free(b);
 }
 
 static void test_strbuf_getstr_partial(void **data)
@@ -200,6 +214,8 @@ static void test_strbuf_getstr_partial(void **data)
     /* no more data available
      */
     assert_true(strbuf_getstr(b, &line, &linelen, "\r\n") < 0);
+
+    strbuf_free(b);
 }
 
 int main(int ac, char **av)
