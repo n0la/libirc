@@ -57,6 +57,27 @@ irc_error_t irc_tag_parse(irc_tag_t t, char const *str)
     return irc_error_success;
 }
 
+irc_tag_t irc_tag_make(char const *key, char const *value)
+{
+    irc_tag_t t = NULL;
+
+    if (key == NULL) {
+        return NULL;
+    }
+
+    t = irc_tag_new();
+    if (t == NULL) {
+        return NULL;
+    }
+
+    t->key = strdup(key);
+    if (value != NULL) {
+        t->value = strdup(value);
+    }
+
+    return t;
+}
+
 irc_error_t irc_tag_string(irc_tag_t t, char **s, size_t *slen)
 {
     strbuf_t buf = NULL;
