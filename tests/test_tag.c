@@ -73,6 +73,24 @@ static void test_tag_unescape(void **data)
     ASSERT_TAG_UNSESCAPED ("\\:\\s\\\\\\r\\n", "; \\\r\n");
 }
 
+#define ASSERT_TAG_ESCAPED(STR, EXPECTED) \
+    escaped = irc_tag_escape(STR); \
+    assert_string_equal(escaped, EXPECTED); \
+    free(escaped);
+
+static void test_tag_escape(void **data)
+{
+    char *escaped = NULL;
+
+    ASSERT_TAG_ESCAPED(";", "\\:");
+    ASSERT_TAG_ESCAPED(" ", "\\s");
+    ASSERT_TAG_ESCAPED("\\", "\\\\");
+    ASSERT_TAG_ESCAPED("\r", "\\r");
+    ASSERT_TAG_ESCAPED("\n", "\\n");
+    ASSERT_TAG_ESCAPED("test", "test");
+    ASSERT_TAG_ESCAPED("; \\\r\n", "\\:\\s\\\\\\r\\n");
+}
+
 int main(int ac, char **av)
 {
     const struct CMUnitTest tests[] = {
@@ -80,6 +98,7 @@ int main(int ac, char **av)
                                         teardown),
         cmocka_unit_test_setup_teardown(test_tag_parse_single, setup, teardown),
         cmocka_unit_test(test_tag_unescape),
+        cmocka_unit_test(test_tag_escape),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

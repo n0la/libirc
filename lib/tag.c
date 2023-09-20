@@ -32,7 +32,7 @@ void irc_tag_free(irc_tag_t t)
     free(t);
 }
 
-irc_error_t irc_tag_parse(irc_tag_t t, const char *str)
+irc_error_t irc_tag_parse(irc_tag_t t, char const *str)
 {
     char *ptr = NULL;
     char *value = NULL;
@@ -57,7 +57,55 @@ irc_error_t irc_tag_parse(irc_tag_t t, const char *str)
     return irc_error_success;
 }
 
-char *irc_tag_unescape(const char *value)
+irc_tag_t irc_tag_make(char const *key, char const *value)
+{
+    irc_tag_t t = NULL;
+
+    if (key == NULL) {
+        return NULL;
+    }
+
+    t = irc_tag_new();
+    if (t == NULL) {
+        return NULL;
+    }
+
+    t->key = strdup(key);
+    if (value != NULL) {
+        t->value = strdup(value);
+    }
+
+    return t;
+}
+
+irc_error_t irc_tag_string(irc_tag_t t, char **s, size_t *slen)
+{
+    strbuf_t buf = NULL;
+
+    if (t == NULL || t->key == NULL || s == NULL) {
+        return irc_error_argument;
+    }
+
+    buf = strbuf_new();
+    strbuf_append(buf, t->key, strlen(t->key));
+    if (t->value != NULL) {
+        char *value = irc_tag_escape(t->value);
+
+        strbuf_append(buf, "=", 1);
+        strbuf_append(buf, value, strlen(value));
+        free(value);
+    }
+
+    *s = strbuf_strdup (buf);
+    if (slen != NULL) {
+        *slen = strbuf_len(buf);
+    }
+    strbuf_free(buf);
+
+    return irc_error_success;
+}
+
+char *irc_tag_unescape(char const *value)
 {
     char *ret = NULL;
     strbuf_t unescaped = NULL;
@@ -65,10 +113,10 @@ char *irc_tag_unescape(const char *value)
     unescaped = strbuf_new();
 
     while (value && value[0]) {
-        switch(value[0]) {
+        switch (value[0]) {
         case '\\':
             value++;
-            switch(value[0]) {
+            switch (value[0]) {
             case ':':
                 strbuf_append(unescaped, ";", 1);
                 value++;
@@ -108,6 +156,43 @@ char *irc_tag_unescape(const char *value)
         ret = strbuf_strdup(unescaped);
     }
     strbuf_free(unescaped);
+
+    return ret;
+}
+
+char *irc_tag_escape(char const *value)
+{
+    char *ret = NULL;
+    strbuf_t escaped = NULL;
+
+    escaped = strbuf_new();
+
+    while (value && value[0]) {
+        switch (value[0]) {
+        case ';':
+            strbuf_append(escaped, "\\:", 2);
+            break;
+        case ' ':
+            strbuf_append(escaped, "\\s", 2);
+            break;
+        case '\\':
+            strbuf_append(escaped, "\\\\", 2);
+            break;
+        case '\r':
+            strbuf_append(escaped, "\\r", 2);
+            break;
+        case '\n':
+            strbuf_append(escaped, "\\n", 2);
+            break;
+        default:
+            strbuf_append(escaped, value, 1);
+            break;
+        }
+        value++;
+    }
+
+    ret = strbuf_strdup(escaped);
+    strbuf_free(escaped);
 
     return ret;
 }
