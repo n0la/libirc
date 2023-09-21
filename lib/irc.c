@@ -248,7 +248,6 @@ static irc_error_t irc_think_data(irc_t i)
     /* strip \r\n from the line
      */
     if (linesize > 2) {
-        line[linesize-2] = '\0';
         linesize -= 2;
     }
 
