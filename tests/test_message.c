@@ -12,7 +12,7 @@ static void test_message_parse_without_tag(void **data)
     const char *str = ":prefix COMMAND Arg";
     irc_error_t error = irc_error_internal;
 
-    error = irc_message_parse(m, str, strlen(str));
+    error = irc_message_parse(m, str, -1);
     assert_int_equal(error, irc_error_success);
     assert_string_equal(m->prefix, "prefix");
     assert_string_equal(m->command, "COMMAND");
@@ -30,7 +30,7 @@ static void test_message_parse_with_single_tag(void **data)
     const char *str = "@time=0000 :prefix COMMAND Arg";
     irc_error_t error = irc_error_internal;
 
-    error = irc_message_parse(m, str, strlen(str));
+    error = irc_message_parse(m, str, -1);
     assert_int_equal(error, irc_error_success);
     assert_string_equal(m->prefix, "prefix");
     assert_string_equal(m->command, "COMMAND");
@@ -49,7 +49,7 @@ static void test_message_parse_with_multiple_tag(void **data)
     const char *str = "@key1=value1;key2;key3=value3 :prefix COMMAND Arg";
     irc_error_t error = irc_error_internal;
 
-    error = irc_message_parse(m, str, strlen(str));
+    error = irc_message_parse(m, str, -1);
     assert_int_equal(error, irc_error_success);
     assert_string_equal(m->prefix, "prefix");
     assert_string_equal(m->command, "COMMAND");
@@ -70,22 +70,18 @@ static void test_message_string(void **data)
 {
     irc_message_t m = irc_message_new();
     const char *expected = "@key1=value1;key2=value2 :prefix COMMAND Arg\r\n";
-    char *str = NULL;
     irc_error_t error = irc_error_internal;
     char *actual = NULL;
     size_t len = 0;
 
-    // Allocate string for parsing without the "\r\n"
-    str = calloc(sizeof(char), strlen(expected) - 1);
-    memcpy(str, expected, strlen(expected) - 2);
-    error = irc_message_parse(m, str, strlen(str));
+    // Pass length minus the "\r\n"
+    error = irc_message_parse(m, expected, strlen(expected) - 2);
     assert_return_code(error, irc_error_success);
 
     error = irc_message_string(m, &actual, &len);
     assert_return_code(error, irc_error_success);
     assert_string_equal(actual, expected);
 
-    free(str);
     free(actual);
     irc_message_unref(m);
 }

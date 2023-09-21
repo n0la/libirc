@@ -105,7 +105,7 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
     irc_tag_t *tags = NULL;
     size_t tagslen = 0;
 
-    char *line = strdup(l);
+    char *line = len < 0 ? strdup(l) : strndup(l, len);
     char *ptr = line;
     char *part = NULL;
     irc_error_t r = irc_error_memory;
