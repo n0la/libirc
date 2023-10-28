@@ -110,6 +110,7 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
     char *part = NULL;
     irc_error_t r = irc_error_memory;
     size_t i = 0;
+    bool final = false;
 
     while ((part = strsep(&line, " ")) != NULL) {
         if (*part == '\0') {
@@ -161,17 +162,20 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
         default:
         {
             if (*part == ':') {
-                if (argbuf) {
-                    irc_message_add(&args, &argslen, argbuf);
-                    strbuf_free(argbuf);
-                    argbuf = NULL;
+                if (argbuf == NULL) {
+                    argbuf = strbuf_new();
+                    if (argbuf == NULL) {
+                        goto cleanup;
+                    }
                 }
 
-                argbuf = strbuf_new();
-                if (argbuf == NULL) {
-                    goto cleanup;
+                if (final == false) {
+                    strbuf_append(argbuf, part + 1, strlen(part) - 1);
+                    final = true;
+                } else {
+                    strbuf_append(argbuf, " ", 1);
+                    strbuf_append(argbuf, part, strlen(part));
                 }
-                strbuf_append(argbuf, part, strlen(part));
             } else {
                 if (argbuf == NULL) {
                     irc_message_add2(&args, &argslen, part);
