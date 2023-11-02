@@ -62,15 +62,15 @@ static void test_tag_unescape(void **data)
 {
     char *unscaped = NULL;
 
-    ASSERT_TAG_UNSESCAPED ("\\:", ";");
-    ASSERT_TAG_UNSESCAPED ("\\s", " ");
-    ASSERT_TAG_UNSESCAPED ("\\\\", "\\");
-    ASSERT_TAG_UNSESCAPED ("\\r", "\r");
-    ASSERT_TAG_UNSESCAPED ("\\n", "\n");
-    ASSERT_TAG_UNSESCAPED ("test", "test");
-    ASSERT_TAG_UNSESCAPED ("test\\", "test");
-    ASSERT_TAG_UNSESCAPED ("test\\b", "testb");
-    ASSERT_TAG_UNSESCAPED ("\\:\\s\\\\\\r\\n", "; \\\r\n");
+    ASSERT_TAG_UNSESCAPED("\\:", ";");
+    ASSERT_TAG_UNSESCAPED("\\s", " ");
+    ASSERT_TAG_UNSESCAPED("\\\\", "\\");
+    ASSERT_TAG_UNSESCAPED("\\r", "\r");
+    ASSERT_TAG_UNSESCAPED("\\n", "\n");
+    ASSERT_TAG_UNSESCAPED("test", "test");
+    ASSERT_TAG_UNSESCAPED("test\\", "test");
+    ASSERT_TAG_UNSESCAPED("test\\b", "testb");
+    ASSERT_TAG_UNSESCAPED("\\:\\s\\\\\\r\\n", "; \\\r\n");
 }
 
 #define ASSERT_TAG_ESCAPED(STR, EXPECTED) \
