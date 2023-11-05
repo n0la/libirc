@@ -31,12 +31,31 @@ static void test_message_parse_with_parameter_containing_spaces(void **data)
     irc_error_t error = irc_error_internal;
 
     error = irc_message_parse(m, str, -1);
-    assert_return_code (error, irc_error_success);
+    assert_return_code(error, irc_error_success);
     assert_string_equal(m->prefix, "guest");
     assert_string_equal(m->command, "PRIVMSG");
     assert_int_equal(m->argslen, 2);
     assert_string_equal(m->args[0], "#channel");
     assert_string_equal(m->args[1], "haha :D");
+    assert_int_equal(m->tagslen, 0);
+    assert_ptr_equal(m->tags, NULL);
+
+    irc_message_unref(m);
+}
+
+static void test_message_parse_with_final_starting_with_semicolon(void **data)
+{
+    irc_message_t m = irc_message_new();
+    const char *str = ":guest PRIVMSG #channel ::-)";
+    irc_error_t error = irc_error_internal;
+
+    error = irc_message_parse(m, str, -1);
+    assert_return_code(error, irc_error_success);
+    assert_string_equal(m->prefix, "guest");
+    assert_string_equal(m->command, "PRIVMSG");
+    assert_int_equal(m->argslen, 2);
+    assert_string_equal(m->args[0], "#channel");
+    assert_string_equal(m->args[1], ":-)");
     assert_int_equal(m->tagslen, 0);
     assert_ptr_equal(m->tags, NULL);
 
@@ -135,12 +154,35 @@ static void test_message_string_with_semicolon(void **data)
 
     // Pass length minus the "\r\n"
     error = irc_message_parse(m, expected, strlen(expected) - 2);
-    assert_int_equal (m->argslen, 2);
+    assert_int_equal(m->argslen, 2);
+    assert_string_equal(m->args[0], "#channel");
     assert_string_equal(m->args[1], "A smiley :) and text");
-    assert_return_code (error, irc_error_success);
+    assert_return_code(error, irc_error_success);
 
     error = irc_message_string(m, &actual, &len);
-    assert_return_code (error, irc_error_success);
+    assert_return_code(error, irc_error_success);
+    assert_string_equal(actual, expected);
+
+    free(actual);
+    irc_message_unref(m);
+}
+
+static void test_message_string_with_final_param_semicolon(void **data)
+{
+    irc_message_t m = irc_message_new();
+    const char *expected = ":prefix PRIVMSG #channel ::-)\r\n";
+    irc_error_t error = irc_error_internal;
+    char *actual = NULL;
+    size_t len = 0;
+
+    error = irc_message_parse(m, expected, strlen(expected) - 2);
+    assert_int_equal(m->argslen, 2);
+    assert_string_equal(m->args[0], "#channel");
+    assert_string_equal(m->args[1], ":-)");
+    assert_return_code(error, irc_error_success);
+
+    error = irc_message_string(m, &actual, &len);
+    assert_return_code(error, irc_error_success);
     assert_string_equal(actual, expected);
 
     free(actual);
@@ -152,11 +194,13 @@ int main(int ac, char **av)
     const struct CMUnitTest tests[] = {
         cmocka_unit_test(test_message_parse_without_tag),
         cmocka_unit_test(test_message_parse_with_parameter_containing_spaces),
+        cmocka_unit_test(test_message_parse_with_final_starting_with_semicolon),
         cmocka_unit_test(test_message_parse_with_parameters),
         cmocka_unit_test(test_message_parse_with_single_tag),
         cmocka_unit_test(test_message_parse_with_multiple_tag),
         cmocka_unit_test(test_message_string),
         cmocka_unit_test(test_message_string_with_semicolon),
+        cmocka_unit_test(test_message_string_with_final_param_semicolon),
     };
 
     return cmocka_run_group_tests(tests, NULL, NULL);

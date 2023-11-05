@@ -84,12 +84,14 @@ static void irc_message_add2(char ***ac, size_t *av, char const *s)
     irc_strv_add(ac, av, dup);
 }
 
-static void irc_message_add(char ***ac, size_t *av, strbuf_t b)
+static void irc_message_add(char ***ac, size_t *av, strbuf_t b, bool final)
 {
     char *dup = NULL;
 
-    if (strbuf_getc(b) == ':') {
-        strbuf_delete(b, 1);
+    if (final == false) {
+        if (strbuf_getc(b) == ':') {
+            strbuf_delete(b, 1);
+        }
     }
 
     dup = strbuf_strdup(b);
@@ -194,7 +196,7 @@ irc_error_t irc_message_parse(irc_message_t c, char const *l, size_t len)
     /* Check if their is remaining argument
      */
     if (argbuf) {
-        irc_message_add(&args, &argslen, argbuf);
+        irc_message_add(&args, &argslen, argbuf, final);
     }
 
     c->prefix = prefix;
@@ -339,9 +341,9 @@ irc_error_t irc_message_string(irc_message_t m, char **s, size_t *slen)
     if (m->args) {
         for (tmp = m->args; *tmp != NULL; ++tmp) {
             size_t tmplen = strlen(*tmp);
-            /* if we find a space we add a `:`
+            /* if we find a space or argument starts with `:` we add a `:`
              */
-            if (strchr(*tmp, ' ') != NULL) {
+            if (strchr(*tmp, ' ') != NULL || *tmp[0] == ':') {
                 strbuf_append(buf, ":", 1);
             }
             strbuf_append(buf, *tmp, tmplen);
