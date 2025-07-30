@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <string.h>
 #include <cmocka.h>
+#include <stdint.h>
 
 #include <irc/message.h>
 

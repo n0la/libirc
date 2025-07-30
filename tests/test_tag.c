@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <cmocka.h>
+#include <stdint.h>
 
 #include <irc/tag.h>
 
